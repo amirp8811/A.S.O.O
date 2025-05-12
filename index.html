@@ -1,4 +1,4 @@
-1<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -60,7 +60,7 @@
 <body>
   <div id="viewport">
     <div class="map-container" id="mapContainer">
-      <img src="map.png" alt="Game Map" class="map-image" id="mapImage" />
+      <img src="your-game-map.png" alt="Game Map" class="map-image" id="mapImage" />
       <div class="grid-overlay" id="gridOverlay"></div>
     </div>
     <div class="tooltip" id="tooltip"></div>
@@ -106,11 +106,27 @@
           }
         }
 
-        viewport.addEventListener('wheel', onZoom);
+        viewport.addEventListener('wheel', onZoom, { passive: false });
         viewport.addEventListener('mousedown', onPanStart);
         viewport.addEventListener('mousemove', onPanMove);
         viewport.addEventListener('mouseup', onPanEnd);
         viewport.addEventListener('mouseleave', onPanEnd);
+      }
+
+      function clampTranslate() {
+        const vpW = viewport.clientWidth;
+        const vpH = viewport.clientHeight;
+        const mapW = img.naturalWidth * scale;
+        const mapH = img.naturalHeight * scale;
+        // clamp X between [vpW - mapW, 0]
+        translate.x = Math.min(0, Math.max(vpW - mapW, translate.x));
+        // clamp Y between [vpH - mapH, 0]
+        translate.y = Math.min(0, Math.max(vpH - mapH, translate.y));
+      }
+
+      function updateTransform() {
+        clampTranslate();
+        mapContainer.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
       }
 
       function onPanStart(e) {
@@ -135,18 +151,15 @@
         const rect = mapContainer.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
-        const wheel = e.deltaY < 0 ? 1.1 : 0.9;
-        const newScale = Math.min(Math.max(0.5, scale * wheel), 5);
+        // reduce sensitivity
+        const factor = e.deltaY < 0 ? 1.05 : 0.95;
+        const newScale = Math.min(Math.max(0.5, scale * factor), 5);
 
         // adjust translate so zoom is toward cursor
         translate.x = e.clientX - (mx * newScale);
         translate.y = e.clientY - (my * newScale);
         scale = newScale;
         updateTransform();
-      }
-
-      function updateTransform() {
-        mapContainer.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
       }
 
       function showTooltip(e) {
