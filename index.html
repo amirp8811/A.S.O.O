@@ -5,47 +5,165 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Interactive Game Map with Grid Tools</title>
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
-    #toolbar { position: absolute; top: 10px; left: 10px; z-index: 1000;
-      background: rgba(255,255,255,0.8); padding: 8px; border-radius: 4px;
-      display: flex; align-items: center; gap: 8px;
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #e0e0e0;
     }
-    #toolbar label { font-size: 14px; }
-    #toolbar input[type=color] { width: 32px; height: 32px; padding:0; border:none; }
-    #toolbar button { padding: 4px 8px; font-size: 14px; }
+    #toolbar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 1000;
+      background: #ffffffcc;
+      padding: 8px 12px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s;
+    }
+    #toolbar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #toolbar label {
+      font-size: 14px;
+      color: #333;
+    }
+    #toolbar input[type=color] {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+    }
+    #toolbar button {
+      padding: 6px 10px;
+      font-size: 14px;
+      background: #ff5555;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #toolbar button:hover {
+      background: #e04444;
+    }
 
-    #viewport { position: relative; width: 100%; height: 100%; background: #f0f0f0;
-      cursor: grab; overflow: hidden;
+    #viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      overflow: hidden;
     }
-    .map-container { position: absolute; top: 0; left: 0; transform-origin: 0 0;
-      width: fit-content; height: fit-content; overflow: hidden;
+    .map-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      width: fit-content;
+      height: fit-content;
+      overflow: hidden;
     }
-    .map-image { display: block; user-select: none; pointer-events: none; }
-    .grid-overlay { position: absolute; top: 0; left: 0; display: grid; pointer-events: none; }
-    .grid-cell { border: 1px solid rgba(0,0,0,0.1); pointer-events: auto; transition: background-color 0.1s; }
-    .grid-cell:hover { background-color: rgba(0,0,0,0.2); cursor: crosshair; }
+    .map-image {
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: grid;
+      pointer-events: none;
+    }
+    .grid-cell {
+      border: 1px solid rgba(0,0,0,0.08);
+      pointer-events: auto;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+    .grid-cell:hover {
+      background-color: rgba(0, 0, 0, 0.15);
+      cursor: crosshair;
+    }
+    .grid-cell.selected {
+      opacity: 0.6;
+    }
 
-    #tooltip { position: absolute; padding: 4px 8px;
-      background: rgba(0,0,0,0.7); color: #fff; border-radius: 4px;
-      font-size: 12px; pointer-events: none; white-space: nowrap;
-      transform: translate(-50%, -120%); display: none; z-index: 1000;
+    #tooltip {
+      position: absolute;
+      padding: 6px 10px;
+      background: rgba(50,50,50,0.85);
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translate(-50%, -120%);
+      display: none;
+      transition: opacity 0.2s;
+      opacity: 0;
+      z-index: 1000;
     }
 
-    #selection-list { position: absolute; top: 10px; right: 10px; z-index:1000;
-      background: rgba(255,255,255,0.8); padding: 8px; border-radius: 4px;
-      max-height: 80%; overflow-y: auto; width: 250px;
+    #selection-list {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1000;
+      background: #ffffffcc;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      max-height: 80%;
+      overflow-y: auto;
+      width: 260px;
+      transition: transform 0.2s;
     }
-    #selection-list h4 { margin: 0 0 4px; font-size:14px; }
-    #selection-list ul { list-style: none; padding: 0; margin: 0; }
-    #selection-list li { font-size:12px; margin-bottom:4px; }
-    #selection-list li span.color-box { display:inline-block; width:12px; height:12px; margin-right:4px; vertical-align:middle; border:1px solid #000; }
+    #selection-list:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #selection-list h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #333;
+    }
+    #selection-list ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #selection-list li {
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      line-height: 1.2;
+    }
+    #selection-list li span.color-box {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 6px;
+      vertical-align: middle;
+      border: 1px solid #000;
+    }
   </style>
 </head>
 <body>
   <div id="toolbar">
-    <label for="colorPicker">Select Color:</label>
+    <label for="colorPicker">Highlight Color:</label>
     <input type="color" id="colorPicker" value="#ff0000" />
-    <button id="clearBtn">Clear Selections</button>
+    <button id="clearBtn">Clear All</button>
   </div>
   <div id="selection-list">
     <h4>Selections</h4>
@@ -53,7 +171,7 @@
   </div>
   <div id="viewport">
     <div class="map-container" id="mapContainer">
-      <img src="map.png" alt="Game Map" class="map-image" id="mapImage" />
+      <img src="your-game-map.png" alt="Game Map" class="map-image" id="mapImage" />
       <div class="grid-overlay" id="gridOverlay"></div>
     </div>
     <div id="tooltip"></div>
@@ -83,27 +201,31 @@
         overlay.style.gridTemplateColumns = `repeat(${cols},1fr)`;
         overlay.style.gridTemplateRows = `repeat(${rows},1fr)`;
 
-        // center
+        // center map
         const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
-        translate.x = (vpW - iw)/2; translate.y = (vpH - ih)/2;
+        translate.x = (vpW - iw) / 2;
+        translate.y = (vpH - ih) / 2;
         updateTransform();
 
-        // build cells
+        // create grid cells
         for (let r = 1; r <= rows; r++) {
           for (let c = 1; c <= cols; c++) {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
-            cell.dataset.row = r; cell.dataset.col = c;
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            // tooltip
             cell.addEventListener('mouseenter', e => showTooltip(e, cell));
             cell.addEventListener('mousemove', moveTooltip);
             cell.addEventListener('mouseleave', hideTooltip);
+            // selection
             cell.addEventListener('mousedown', e => startSelect(e, cell));
             cell.addEventListener('mouseenter', e => { if (isSelecting) extendSelect(cell); });
-            overlay.append(cell);
+            overlay.appendChild(cell);
           }
         }
 
-        viewport.addEventListener('wheel', onZoom, { passive:false });
+        viewport.addEventListener('wheel', onZoom, { passive: false });
         viewport.addEventListener('mousedown', onPanStart);
         viewport.addEventListener('mousemove', onPanMove);
         viewport.addEventListener('mouseup', onPanEnd);
@@ -112,54 +234,68 @@
 
       function updateTransform() {
         clamp();
-        mapContainer.style.transform = `translate(${translate.x}px,${translate.y}px) scale(${scale})`;
+        mapContainer.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
       }
       function clamp() {
         const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
-        const mapW = img.naturalWidth*scale, mapH = img.naturalHeight*scale;
-        translate.x = mapW>vpW
-          ? Math.min(0, Math.max(vpW-mapW, translate.x))
-          : (vpW-mapW)/2;
-        translate.y = mapH>vpH
-          ? Math.min(0, Math.max(vpH-mapH, translate.y))
-          : (vpH-mapH)/2;
+        const mapW = img.naturalWidth * scale, mapH = img.naturalHeight * scale;
+        translate.x = mapW > vpW
+          ? Math.min(0, Math.max(vpW - mapW, translate.x))
+          : (vpW - mapW) / 2;
+        translate.y = mapH > vpH
+          ? Math.min(0, Math.max(vpH - mapH, translate.y))
+          : (vpH - mapH) / 2;
       }
 
       function onPanStart(e) {
-        if (e.button!==0 || isSelecting) return;
+        if (e.button !== 0 || isSelecting) return;
         isPanning = true;
         panStart = { x: e.clientX - translate.x, y: e.clientY - translate.y };
         viewport.style.cursor = 'grabbing';
       }
-      function onPanMove(e) { if (!isPanning) return; translate.x = e.clientX - panStart.x; translate.y = e.clientY - panStart.y; updateTransform(); }
-      function onPanEnd() { isPanning=false; viewport.style.cursor='grab'; if(isSelecting) finishSelect(); }
+      function onPanMove(e) {
+        if (!isPanning) return;
+        translate.x = e.clientX - panStart.x;
+        translate.y = e.clientY - panStart.y;
+        updateTransform();
+      }
+      function onPanEnd() {
+        isPanning = false;
+        viewport.style.cursor = 'grab';
+        if (isSelecting) finishSelect();
+      }
 
       function onZoom(e) {
         e.preventDefault();
         const rect = mapContainer.getBoundingClientRect();
-        const mx = (e.clientX - rect.left)/scale;
-        const my = (e.clientY - rect.top)/scale;
-        const factor = 1 - e.deltaY*0.001;
-        const newScale = Math.min(Math.max(0.5, scale*factor),5);
-        translate.x = e.clientX - mx*newScale;
-        translate.y = e.clientY - my*newScale;
-        scale = newScale; updateTransform();
+        const mx = (e.clientX - rect.left) / scale;
+        const my = (e.clientY - rect.top) / scale;
+        const factor = 1 - e.deltaY * 0.001;
+        const newScale = Math.min(Math.max(0.5, scale * factor), 5);
+        translate.x = e.clientX - mx * newScale;
+        translate.y = e.clientY - my * newScale;
+        scale = newScale;
+        updateTransform();
       }
 
       function showTooltip(e, cell) {
         tooltip.style.display = 'block';
-        tooltip.textContent = `(${cell.dataset.col},${cell.dataset.row})`;
+        tooltip.style.opacity = '1';
+        tooltip.textContent = `(${cell.dataset.col}, ${cell.dataset.row})`;
       }
       function moveTooltip(e) {
         const r = e.target.getBoundingClientRect();
         const v = viewport.getBoundingClientRect();
-        tooltip.style.left = `${r.left - v.left + r.width/2}px`;
+        tooltip.style.left = `${r.left - v.left + r.width / 2}px`;
         tooltip.style.top = `${r.top - v.top}px`;
       }
-      function hideTooltip() { tooltip.style.display = 'none'; }
+      function hideTooltip() {
+        tooltip.style.opacity = '0';
+        setTimeout(() => { if (tooltip.style.opacity === '0') tooltip.style.display = 'none'; }, 200);
+      }
 
       function startSelect(e, cell) {
-        if (e.button!==0) return;
+        if (e.button !== 0) return;
         isSelecting = true;
         selectStart = cell;
         clearHighlights();
@@ -169,47 +305,62 @@
         clearHighlights();
         const r1 = +selectStart.dataset.row, c1 = +selectStart.dataset.col;
         const r2 = +cell.dataset.row, c2 = +cell.dataset.col;
-        const rmin = Math.min(r1,r2), rmax = Math.max(r1,r2);
-        const cmin = Math.min(c1,c2), cmax = Math.max(c1,c2);
+        const rmin = Math.min(r1, r2), rmax = Math.max(r1, r2);
+        const cmin = Math.min(c1, c2), cmax = Math.max(c1, c2);
         overlay.querySelectorAll('.grid-cell').forEach(c => {
           const rr = +c.dataset.row, cc = +c.dataset.col;
-          if (rr>=rmin&&rr<=rmax&&cc>=cmin&&cc<=cmax) highlight(c);
+          if (rr >= rmin && rr <= rmax && cc >= cmin && cc <= cmax) highlight(c);
         });
       }
       function finishSelect() {
-        isSelecting=false;
-        const highlighted = Array.from(overlay.querySelectorAll('.grid-cell[data-highlighted]'));
+        isSelecting = false;
+        const highlighted = Array.from(overlay.querySelectorAll('.grid-cell.selected'));
         const color = colorPicker.value;
-        const pts = highlighted.map(c=>`(${c.dataset.col},${c.dataset.row})`);
-        selections.push({color,pts});
-        highlighted.forEach(c => { c.style.backgroundColor = color; c.removeAttribute('data-highlighted'); });
+        const pts = highlighted.map(c => `(${c.dataset.col}, ${c.dataset.row})`);
+        selections.push({ color, pts });
+        highlighted.forEach(c => c.classList.remove('selected'));
         renderList();
       }
 
       function highlight(cell) {
-        cell.setAttribute('data-highlighted','');
-        cell.style.backgroundColor = colorPicker.value + '80';
+        cell.classList.add('selected');
+        cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.4);
       }
       function clearHighlights() {
-        overlay.querySelectorAll('.grid-cell[data-highlighted]').forEach(c => c.removeAttribute('data-highlighted'));
+        overlay.querySelectorAll('.grid-cell.selected').forEach(c => {
+          c.classList.remove('selected');
+          c.style.backgroundColor = '';
+        });
       }
 
       function renderList() {
         selList.innerHTML = '';
-        selections.forEach((sel,i)=>{
+        selections.forEach((sel, i) => {
           const li = document.createElement('li');
-          const box = document.createElement('span'); box.className='color-box'; box.style.background=sel.color;
-          const text = document.createTextNode(`Group ${i+1}: ${sel.pts.join(', ')}`);
+          const box = document.createElement('span');
+          box.className = 'color-box';
+          box.style.background = sel.color;
+          const text = document.createTextNode(`Group ${i + 1}: ${sel.pts.join(', ')}`);
           li.append(box, text);
           selList.append(li);
         });
       }
 
       clearBtn.onclick = () => {
-        selections.length=0;
-        selList.innerHTML='';
-        overlay.querySelectorAll('.grid-cell').forEach(c=>c.style.background='');
+        selections.length = 0;
+        selList.innerHTML = '';
+        overlay.querySelectorAll('.grid-cell').forEach(c => {
+          c.style.backgroundColor = '';
+        });
       };
+
+      function hexToRgba(hex, alpha) {
+        const bigint = parseInt(hex.replace('#',''), 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r},${g},${b},${alpha})`;
+      }
     })();
   </script>
 </body>
