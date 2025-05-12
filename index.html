@@ -3,42 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Game Map Grid Overlay</title>
+  <title>Game Map Grid Overlay with Pan/Zoom & Selection</title>
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; }
-    .map-container {
+    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    #viewport {
       position: relative;
-      display: inline-block;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .map-container {
+      position: absolute;
+      top: 0; left: 0;
+      transform-origin: 0 0;
     }
     .map-image {
       display: block;
-      max-width: 100%;
-      height: auto;
+      user-select: none;
+      pointer-events: none;
     }
     .grid-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
       display: grid;
-      pointer-events: none; /* allow hover events on children */
+      pointer-events: none;
     }
     .grid-cell {
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
       pointer-events: auto;
       background-color: transparent;
-      transition: background-color 0.2s;
+      transition: background-color 0.1s;
     }
-    .grid-cell:hover {
-      background-color: rgba(0, 0, 0, 0.2);
+    .grid-cell:hover, .grid-cell.selected {
+      background-color: rgba(0, 0, 0, 0.25);
       cursor: crosshair;
     }
     .tooltip {
       position: absolute;
       padding: 4px 8px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
       border-radius: 4px;
       font-size: 12px;
       pointer-events: none;
@@ -49,27 +53,38 @@
   </style>
 </head>
 <body>
-  <div class="map-container" id="mapContainer">
-    <img src="map.png" alt="Game Map" class="map-image" id="mapImage" />
-    <div class="grid-overlay" id="gridOverlay"></div>
+  <div id="viewport">
+    <div class="map-container" id="mapContainer">
+      <img src="map.png" alt="Game Map" class="map-image" id="mapImage" />
+      <div class="grid-overlay" id="gridOverlay"></div>
+    </div>
     <div class="tooltip" id="tooltip"></div>
   </div>
 
   <script>
     (function() {
-      const cols = 10; // set number of columns
-      const rows = 10; // set number of rows
+      const cols = 20;   // more columns for smaller grid
+      const rows = 20;   // more rows
       const overlay = document.getElementById('gridOverlay');
+      const mapContainer = document.getElementById('mapContainer');
+      const viewport = document.getElementById('viewport');
       const tooltip = document.getElementById('tooltip');
+      let scale = 1;
+      let translate = { x: 0, y: 0 };
+      let isPanning = false;
+      let panStart = {};
+      let selectStart = null;
+      let isSelecting = false;
 
-      // Wait until image loads to set overlay grid
       const img = document.getElementById('mapImage');
-      img.addEventListener('load', initGrid);
+      img.addEventListener('load', init);
 
-      function initGrid() {
-        // set grid dimensions
+      function init() {
+        // set overlay grid size
         overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        overlay.style.width = img.clientWidth + 'px';
+        overlay.style.height = img.clientHeight + 'px';
 
         // create cells
         for (let r = 1; r <= rows; r++) {
@@ -78,33 +93,108 @@
             cell.className = 'grid-cell';
             cell.dataset.row = r;
             cell.dataset.col = c;
-            // enable pointer events
-            cell.addEventListener('mousemove', onHover);
-            cell.addEventListener('mouseenter', onEnter);
-            cell.addEventListener('mouseleave', onLeave);
+            cell.addEventListener('mouseenter', showTooltip);
+            cell.addEventListener('mousemove', moveTooltip);
+            cell.addEventListener('mouseleave', hideTooltip);
+            cell.addEventListener('mousedown', startSelection);
             overlay.appendChild(cell);
           }
         }
+
+        // viewport events for pan/zoom
+        viewport.addEventListener('wheel', onZoom);
+        viewport.addEventListener('mousedown', onPanStart);
+        viewport.addEventListener('mousemove', onPanMove);
+        viewport.addEventListener('mouseup', onPanEnd);
+        viewport.addEventListener('mouseleave', () => { isPanning = false; });
       }
 
-      function onEnter(e) {
+      // Pan
+      function onPanStart(e) {
+        if (e.button !== 1) return;  // middle button
+        isPanning = true;
+        panStart = { x: e.clientX - translate.x, y: e.clientY - translate.y };
+        viewport.style.cursor = 'grabbing';
+      }
+      function onPanMove(e) {
+        if (!isPanning) return;
+        translate.x = e.clientX - panStart.x;
+        translate.y = e.clientY - panStart.y;
+        updateTransform();
+      }
+      function onPanEnd() {
+        isPanning = false;
+        viewport.style.cursor = 'grab';
+      }
+
+      function onZoom(e) {
+        e.preventDefault();
+        const delta = -e.deltaY * 0.001;
+        const newScale = Math.min(Math.max(0.5, scale + delta), 5);
+        scale = newScale;
+        updateTransform();
+      }
+
+      function updateTransform() {
+        mapContainer.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
+      }
+
+      // Tooltip
+      function showTooltip(e) {
+        if (isSelecting) return;
         const cell = e.target;
         tooltip.style.display = 'block';
         tooltip.textContent = `(${cell.dataset.col}, ${cell.dataset.row})`;
       }
-
-      function onHover(e) {
+      function moveTooltip(e) {
         const cell = e.target;
         const rect = cell.getBoundingClientRect();
-        const mapRect = document.getElementById('mapContainer').getBoundingClientRect();
-        // position tooltip relative to cell
-        tooltip.style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
-        tooltip.style.top = `${rect.top - mapRect.top}px`;
+        const vpRect = viewport.getBoundingClientRect();
+        tooltip.style.left = `${rect.left - vpRect.left + rect.width/2}px`;
+        tooltip.style.top = `${rect.top - vpRect.top}px`;
+      }
+      function hideTooltip() {
+        if (!isSelecting) tooltip.style.display = 'none';
       }
 
-      function onLeave() {
+      // Selection
+      function startSelection(e) {
+        if (e.button !== 0) return; // left button
+        isSelecting = true;
+        selectStart = { col: +e.target.dataset.col, row: +e.target.dataset.row };
+        clearSelection();
+        viewport.addEventListener('mousemove', updateSelection);
+        viewport.addEventListener('mouseup', endSelection);
+      }
+      function updateSelection(e) {
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        if (!el || !el.classList.contains('grid-cell')) return;
+        const col = +el.dataset.col;
+        const row = +el.dataset.row;
+        highlightCells(selectStart, { col, row });
+      }
+      function endSelection() {
+        isSelecting = false;
+        selectStart = null;
+        viewport.removeEventListener('mousemove', updateSelection);
+        viewport.removeEventListener('mouseup', endSelection);
         tooltip.style.display = 'none';
       }
+      function clearSelection() {
+        overlay.querySelectorAll('.grid-cell.selected').forEach(c => c.classList.remove('selected'));
+      }
+      function highlightCells(start, end) {
+        clearSelection();
+        const c1 = Math.min(start.col, end.col);
+        const c2 = Math.max(start.col, end.col);
+        const r1 = Math.min(start.row, end.row);
+        const r2 = Math.max(start.row, end.row);
+        overlay.querySelectorAll('.grid-cell').forEach(c => {
+          const cc = +c.dataset.col, rr = +c.dataset.row;
+          if (cc >= c1 && cc <= c2 && rr >= r1 && rr <= r2) c.classList.add('selected');
+        });
+      }
+
     })();
   </script>
 </body>
