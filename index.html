@@ -20,47 +20,17 @@
       width: fit-content;
       height: fit-content;
     }
-    .map-image {
-      display: block;
-      user-select: none;
-      pointer-events: none;
-      max-width: none;
-    }
-    .grid-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      display: grid;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .grid-cell {
-      border: 1px solid rgba(255,255,255,0.1);
-      pointer-events: auto;
-      background-color: transparent;
-      transition: background-color 0.1s;
-    }
-    .grid-cell:hover, .grid-cell.selected {
-      background-color: rgba(0, 0, 0, 0.25);
-      cursor: crosshair;
-    }
-    .tooltip {
-      position: absolute;
-      padding: 4px 8px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      border-radius: 4px;
-      font-size: 12px;
-      pointer-events: none;
-      white-space: nowrap;
-      transform: translate(-50%, -120%);
-      display: none;
-    }
+    .map-image { display: block; user-select: none; pointer-events: none; max-width: none; }
+    .grid-overlay { position: absolute; top: 0; left: 0; display: grid; pointer-events: none; overflow: hidden; }
+    .grid-cell { border: 1px solid rgba(255,255,255,0.1); pointer-events: auto; background-color: transparent; transition: background-color 0.1s; }
+    .grid-cell:hover, .grid-cell.selected { background-color: rgba(0,0,0,0.25); cursor: crosshair; }
+    .tooltip { position: absolute; padding: 4px 8px; background: rgba(0,0,0,0.7); color: #fff; border-radius: 4px; font-size: 12px; pointer-events: none; white-space: nowrap; transform: translate(-50%, -120%); display: none; }
   </style>
 </head>
 <body>
   <div id="viewport">
     <div class="map-container" id="mapContainer">
-      <img src="map.png" alt="Game Map" class="map-image" id="mapImage" />
+      <img src="your-game-map.png" alt="Game Map" class="map-image" id="mapImage" />
       <div class="grid-overlay" id="gridOverlay"></div>
     </div>
     <div class="tooltip" id="tooltip"></div>
@@ -68,42 +38,36 @@
 
   <script>
     (function() {
-      const cols = 20;
-      const rows = 20;
+      const cols = 20, rows = 20;
       const overlay = document.getElementById('gridOverlay');
       const mapContainer = document.getElementById('mapContainer');
       const viewport = document.getElementById('viewport');
       const tooltip = document.getElementById('tooltip');
-      let scale = 1;
-      let translate = { x: 0, y: 0 };
-      let isPanning = false;
-      let panStart = {};
-      let selectStart = null;
-      let isSelecting = false;
-
+      let scale = 1, translate = { x: 0, y: 0 }, isPanning = false, panStart = {}, selectStart = null, isSelecting = false;
       const img = document.getElementById('mapImage');
-      img.addEventListener('load', init);
 
-      function init() {
+      img.onload = () => {
+        const iw = img.naturalWidth, ih = img.naturalHeight;
         overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-        overlay.style.width = img.naturalWidth + 'px';
-        overlay.style.height = img.naturalHeight + 'px';
-        mapContainer.style.width = img.naturalWidth + 'px';
-        mapContainer.style.height = img.naturalHeight + 'px';
+        overlay.style.width = iw + 'px'; overlay.style.height = ih + 'px';
+        mapContainer.style.width = iw + 'px'; mapContainer.style.height = ih + 'px';
 
-        for (let r = 1; r <= rows; r++) {
-          for (let c = 1; c <= cols; c++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.dataset.row = r;
-            cell.dataset.col = c;
-            cell.addEventListener('mouseenter', showTooltip);
-            cell.addEventListener('mousemove', moveTooltip);
-            cell.addEventListener('mouseleave', hideTooltip);
-            cell.addEventListener('mousedown', startSelection);
-            overlay.appendChild(cell);
-          }
+        // initial center
+        const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
+        translate.x = (vpW - iw) / 2;
+        translate.y = (vpH - ih) / 2;
+        updateTransform();
+
+        // build cells
+        for (let r=1; r<=rows; r++) for (let c=1; c<=cols; c++) {
+          const cell = document.createElement('div');
+          cell.className='grid-cell'; cell.dataset.row=r; cell.dataset.col=c;
+          cell.addEventListener('mouseenter', showTooltip);
+          cell.addEventListener('mousemove', moveTooltip);
+          cell.addEventListener('mouseleave', hideTooltip);
+          cell.addEventListener('mousedown', startSelection);
+          overlay.appendChild(cell);
         }
 
         viewport.addEventListener('wheel', onZoom, { passive: false });
@@ -111,17 +75,16 @@
         viewport.addEventListener('mousemove', onPanMove);
         viewport.addEventListener('mouseup', onPanEnd);
         viewport.addEventListener('mouseleave', onPanEnd);
-      }
+      };
 
       function clampTranslate() {
-        const vpW = viewport.clientWidth;
-        const vpH = viewport.clientHeight;
-        const mapW = img.naturalWidth * scale;
-        const mapH = img.naturalHeight * scale;
-        // clamp X between [vpW - mapW, 0]
-        translate.x = Math.min(0, Math.max(vpW - mapW, translate.x));
-        // clamp Y between [vpH - mapH, 0]
-        translate.y = Math.min(0, Math.max(vpH - mapH, translate.y));
+        const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
+        const mapW = img.naturalWidth * scale, mapH = img.naturalHeight * scale;
+        // if larger than viewport, clamp; else center
+        if (mapW > vpW) translate.x = Math.min(0, Math.max(vpW - mapW, translate.x));
+        else translate.x = (vpW - mapW) / 2;
+        if (mapH > vpH) translate.y = Math.min(0, Math.max(vpH - mapH, translate.y));
+        else translate.y = (vpH - mapH) / 2;
       }
 
       function updateTransform() {
@@ -130,89 +93,52 @@
       }
 
       function onPanStart(e) {
-        if (e.button !== 1) return;
+        if (e.button !== 0) return;
         isPanning = true;
         panStart = { x: e.clientX - translate.x, y: e.clientY - translate.y };
         viewport.style.cursor = 'grabbing';
       }
-      function onPanMove(e) {
-        if (!isPanning) return;
-        translate.x = e.clientX - panStart.x;
-        translate.y = e.clientY - panStart.y;
-        updateTransform();
-      }
-      function onPanEnd() {
-        isPanning = false;
-        viewport.style.cursor = 'grab';
-      }
+      function onPanMove(e) { if (!isPanning) return; translate.x = e.clientX - panStart.x; translate.y = e.clientY - panStart.y; updateTransform(); }
+      function onPanEnd() { isPanning = false; viewport.style.cursor = 'grab'; }
 
       function onZoom(e) {
         e.preventDefault();
         const rect = mapContainer.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-        // reduce sensitivity
-        const factor = e.deltaY < 0 ? 1.05 : 0.95;
+        const mx = (e.clientX - rect.left) / scale;
+        const my = (e.clientY - rect.top) / scale;
+        const factor = 1 - e.deltaY * 0.001;
         const newScale = Math.min(Math.max(0.5, scale * factor), 5);
-
-        // adjust translate so zoom is toward cursor
-        translate.x = e.clientX - (mx * newScale);
-        translate.y = e.clientY - (my * newScale);
+        // adjust translate to zoom at cursor
+        translate.x = e.clientX - mx * newScale;
+        translate.y = e.clientY - my * newScale;
         scale = newScale;
         updateTransform();
       }
 
-      function showTooltip(e) {
-        if (isSelecting) return;
-        tooltip.style.display = 'block';
-        tooltip.textContent = `(${e.target.dataset.col}, ${e.target.dataset.row})`;
-      }
-      function moveTooltip(e) {
-        const rect = e.target.getBoundingClientRect();
-        const vpRect = viewport.getBoundingClientRect();
-        tooltip.style.left = `${rect.left - vpRect.left + rect.width/2}px`;
-        tooltip.style.top = `${rect.top - vpRect.top}px`;
-      }
-      function hideTooltip() {
-        if (!isSelecting) tooltip.style.display = 'none';
-      }
+      function showTooltip(e) { if (isSelecting) return; tooltip.style.display='block'; tooltip.textContent=`(${e.target.dataset.col},${e.target.dataset.row})`; }
+      function moveTooltip(e) { const r=e.target.getBoundingClientRect(), v=viewport.getBoundingClientRect(); tooltip.style.left=`${r.left-v.left+r.width/2}px`; tooltip.style.top=`${r.top-v.top}px`; }
+      function hideTooltip() { if(!isSelecting) tooltip.style.display='none'; }
 
       function startSelection(e) {
-        if (e.button !== 0) return;
-        isSelecting = true;
-        selectStart = { col: +e.target.dataset.col, row: +e.target.dataset.row };
-        clearSelection();
-        viewport.addEventListener('mousemove', updateSelection);
-        viewport.addEventListener('mouseup', endSelection);
+        if (e.button!==2) return;
+        isSelecting=true;
+        selectStart={col:+e.target.dataset.col,row:+e.target.dataset.row};
+        overlay.querySelectorAll('.grid-cell.selected').forEach(c=>c.classList.remove('selected'));
+        viewport.addEventListener('mousemove',updateSelection);
+        viewport.addEventListener('mouseup',endSelection);
       }
       function updateSelection(e) {
-        const el = document.elementFromPoint(e.clientX, e.clientY);
-        if (!el || !el.classList.contains('grid-cell')) return;
-        const col = +el.dataset.col;
-        const row = +el.dataset.row;
-        highlightCells(selectStart, { col, row });
-      }
-      function endSelection() {
-        isSelecting = false;
-        selectStart = null;
-        viewport.removeEventListener('mousemove', updateSelection);
-        viewport.removeEventListener('mouseup', endSelection);
-        tooltip.style.display = 'none';
-      }
-      function clearSelection() {
-        overlay.querySelectorAll('.grid-cell.selected').forEach(c => c.classList.remove('selected'));
-      }
-      function highlightCells(start, end) {
-        clearSelection();
-        const c1 = Math.min(start.col, end.col);
-        const c2 = Math.max(start.col, end.col);
-        const r1 = Math.min(start.row, end.row);
-        const r2 = Math.max(start.row, end.row);
-        overlay.querySelectorAll('.grid-cell').forEach(c => {
-          const cc = +c.dataset.col, rr = +c.dataset.row;
-          if (cc >= c1 && cc <= c2 && rr >= r1 && rr <= r2) c.classList.add('selected');
+        const el=document.elementFromPoint(e.clientX,e.clientY);
+        if(!el||!el.classList.contains('grid-cell'))return;
+        const col=+el.dataset.col,row=+el.dataset.row;
+        const c1=Math.min(selectStart.col,col),c2=Math.max(selectStart.col,col);
+        const r1=Math.min(selectStart.row,row),r2=Math.max(selectStart.row,row);
+        overlay.querySelectorAll('.grid-cell').forEach(c=>{
+          const cc=+c.dataset.col,rr=+c.dataset.row;
+          if(cc>=c1&&cc<=c2&&rr>=r1&&rr<=r2)c.classList.add('selected');
         });
       }
+      function endSelection() { isSelecting=false; viewport.removeEventListener('mousemove',updateSelection); viewport.removeEventListener('mouseup',endSelection); tooltip.style.display='none'; }
 
     })();
   </script>
