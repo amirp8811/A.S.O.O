@@ -16,17 +16,22 @@
       position: absolute;
       top: 0; left: 0;
       transform-origin: 0 0;
+      overflow: hidden;
+      width: fit-content;
+      height: fit-content;
     }
     .map-image {
       display: block;
       user-select: none;
       pointer-events: none;
+      max-width: none;
     }
     .grid-overlay {
       position: absolute;
       top: 0; left: 0;
       display: grid;
       pointer-events: none;
+      overflow: hidden;
     }
     .grid-cell {
       border: 1px solid rgba(255,255,255,0.1);
@@ -55,7 +60,7 @@
 <body>
   <div id="viewport">
     <div class="map-container" id="mapContainer">
-      <img src="map.png" alt="Game Map" class="map-image" id="mapImage" />
+      <img src="your-game-map.png" alt="Game Map" class="map-image" id="mapImage" />
       <div class="grid-overlay" id="gridOverlay"></div>
     </div>
     <div class="tooltip" id="tooltip"></div>
@@ -63,8 +68,8 @@
 
   <script>
     (function() {
-      const cols = 20;   // more columns for smaller grid
-      const rows = 20;   // more rows
+      const cols = 20;
+      const rows = 20;
       const overlay = document.getElementById('gridOverlay');
       const mapContainer = document.getElementById('mapContainer');
       const viewport = document.getElementById('viewport');
@@ -80,13 +85,13 @@
       img.addEventListener('load', init);
 
       function init() {
-        // set overlay grid size
         overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-        overlay.style.width = img.clientWidth + 'px';
-        overlay.style.height = img.clientHeight + 'px';
+        overlay.style.width = img.naturalWidth + 'px';
+        overlay.style.height = img.naturalHeight + 'px';
+        mapContainer.style.width = img.naturalWidth + 'px';
+        mapContainer.style.height = img.naturalHeight + 'px';
 
-        // create cells
         for (let r = 1; r <= rows; r++) {
           for (let c = 1; c <= cols; c++) {
             const cell = document.createElement('div');
@@ -101,17 +106,15 @@
           }
         }
 
-        // viewport events for pan/zoom
         viewport.addEventListener('wheel', onZoom);
         viewport.addEventListener('mousedown', onPanStart);
         viewport.addEventListener('mousemove', onPanMove);
         viewport.addEventListener('mouseup', onPanEnd);
-        viewport.addEventListener('mouseleave', () => { isPanning = false; });
+        viewport.addEventListener('mouseleave', onPanEnd);
       }
 
-      // Pan
       function onPanStart(e) {
-        if (e.button !== 1) return;  // middle button
+        if (e.button !== 1) return;
         isPanning = true;
         panStart = { x: e.clientX - translate.x, y: e.clientY - translate.y };
         viewport.style.cursor = 'grabbing';
@@ -129,8 +132,15 @@
 
       function onZoom(e) {
         e.preventDefault();
-        const delta = -e.deltaY * 0.001;
-        const newScale = Math.min(Math.max(0.5, scale + delta), 5);
+        const rect = mapContainer.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        const wheel = e.deltaY < 0 ? 1.1 : 0.9;
+        const newScale = Math.min(Math.max(0.5, scale * wheel), 5);
+
+        // adjust translate so zoom is toward cursor
+        translate.x = e.clientX - (mx * newScale);
+        translate.y = e.clientY - (my * newScale);
         scale = newScale;
         updateTransform();
       }
@@ -139,16 +149,13 @@
         mapContainer.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
       }
 
-      // Tooltip
       function showTooltip(e) {
         if (isSelecting) return;
-        const cell = e.target;
         tooltip.style.display = 'block';
-        tooltip.textContent = `(${cell.dataset.col}, ${cell.dataset.row})`;
+        tooltip.textContent = `(${e.target.dataset.col}, ${e.target.dataset.row})`;
       }
       function moveTooltip(e) {
-        const cell = e.target;
-        const rect = cell.getBoundingClientRect();
+        const rect = e.target.getBoundingClientRect();
         const vpRect = viewport.getBoundingClientRect();
         tooltip.style.left = `${rect.left - vpRect.left + rect.width/2}px`;
         tooltip.style.top = `${rect.top - vpRect.top}px`;
@@ -157,9 +164,8 @@
         if (!isSelecting) tooltip.style.display = 'none';
       }
 
-      // Selection
       function startSelection(e) {
-        if (e.button !== 0) return; // left button
+        if (e.button !== 0) return;
         isSelecting = true;
         selectStart = { col: +e.target.dataset.col, row: +e.target.dataset.row };
         clearSelection();
