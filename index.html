@@ -10,69 +10,153 @@
       padding: 0;
       height: 100%;
       overflow: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #e0e0e0;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
     }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     #toolbar {
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 16px;
+      left: 16px;
       z-index: 1000;
-      background: #ffffffcc;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      background: rgba(30, 30, 30, 0.95);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: transform 0.2s;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      width: 300px;
     }
     #toolbar:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
     }
-    #toolbar label {
+    .toolbar-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .toolbar-section h3 {
+      margin: 0 0 16px;
       font-size: 14px;
-      color: #333;
+      color: rgba(255,255,255,0.9);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .toolbar-group:last-child {
+      margin-bottom: 0;
+    }
+    .toolbar-group label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      min-width: 120px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+    }
+    #toolbar input[type=number] {
+      width: 70px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 13px;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    #toolbar input[type=number]:focus {
+      outline: none;
+      border-color: #ff5555;
+      box-shadow: 0 0 0 2px rgba(255,85,85,0.2);
     }
     #toolbar input[type=color] {
-      width: 28px;
-      height: 28px;
+      width: 40px;
+      height: 40px;
       padding: 0;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
+      background: none;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    #toolbar input[type=color]:hover {
+      transform: scale(1.05);
     }
     #toolbar button {
-      padding: 6px 10px;
-      font-size: 14px;
+      padding: 10px 20px;
+      font-size: 13px;
       background: #ff5555;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       color: white;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex: 1;
+      font-family: 'Inter', sans-serif;
+    }
+    #toolbar button.secondary {
+      background: rgba(255,255,255,0.1);
     }
     #toolbar button:hover {
-      background: #e04444;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255,85,85,0.3);
+    }
+    #toolbar button.secondary:hover {
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #toolbar button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     #viewport {
-      position: relative;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       cursor: grab;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
     .map-container {
       position: absolute;
       top: 0;
       left: 0;
+      width: unset;
+      height: unset;
       transform-origin: 0 0;
-      width: fit-content;
-      height: fit-content;
       overflow: hidden;
     }
     .map-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: block;
       user-select: none;
       pointer-events: none;
@@ -82,60 +166,93 @@
       top: 0;
       left: 0;
       display: grid;
-      pointer-events: none;
+      pointer-events: auto;
+      width: 100%;
+      height: 100%;
     }
     .grid-cell {
-      border: 1px solid rgba(0,0,0,0.08);
+      border: 0.5px solid rgba(255,255,255,0.05);
       pointer-events: auto;
       background-color: transparent;
-      transition: background-color 0.2s;
+      transition: all 0.2s;
+      aspect-ratio: 1;
+      width: 100%;
+      height: 100%;
     }
     .grid-cell:hover {
-      background-color: rgba(0, 0, 0, 0.15);
+      background-color: rgba(255,255,255,0.1);
       cursor: crosshair;
     }
     .grid-cell.selected {
-      opacity: 0.6;
+      opacity: 0.8;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.2);
+    }
+    .grid-cell.boundary {
+      background-color: rgba(255,85,85,0.3);
+      border: 1px solid rgba(255,85,85,0.5);
+    }
+    .grid-cell.preview {
+      background-color: rgba(255,85,85,0.1);
+      border: 1px dashed rgba(255,85,85,0.3);
+    }
+    .grid-cell.control-point {
+      background-color: rgba(85,170,255,0.3);
+      border: 1px solid rgba(85,170,255,0.5);
+      cursor: move;
+    }
+    .grid-cell.control-line {
+      background-color: rgba(85,170,255,0.1);
+      border: 1px dashed rgba(85,170,255,0.3);
     }
 
     #tooltip {
       position: absolute;
-      padding: 6px 10px;
-      background: rgba(50,50,50,0.85);
+      padding: 10px 16px;
+      background: rgba(30,30,30,0.95);
       color: #fff;
-      border-radius: 4px;
-      font-size: 12px;
+      border-radius: 8px;
+      font-size: 13px;
       pointer-events: none;
       white-space: nowrap;
       transform: translate(-50%, -120%);
       display: none;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
       opacity: 0;
       z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-family: 'Inter', sans-serif;
     }
 
     #selection-list {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 16px;
+      right: 16px;
       z-index: 1000;
-      background: #ffffffcc;
-      padding: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      background: rgba(30, 30, 30, 0.95);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       max-height: 80%;
       overflow-y: auto;
-      width: 260px;
-      transition: transform 0.2s;
+      width: 300px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
     }
     #selection-list:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
     }
     #selection-list h4 {
-      margin: 0 0 6px;
-      font-size: 15px;
-      color: #333;
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.9);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
     }
     #selection-list ul {
       list-style: none;
@@ -144,26 +261,416 @@
     }
     #selection-list li {
       font-size: 13px;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.4;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    #selection-list li:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateX(4px);
+    }
+    .selection-header {
       display: flex;
       align-items: center;
-      line-height: 1.2;
+      cursor: pointer;
+      user-select: none;
     }
-    #selection-list li span.color-box {
+    .selection-header span.color-box {
       display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-right: 6px;
-      vertical-align: middle;
-      border: 1px solid #000;
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .selection-header .selection-title {
+      flex: 1;
+      font-weight: 500;
+    }
+    .selection-header .toggle-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .selection-header .toggle-icon::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid rgba(255,255,255,0.7);
+      border-bottom: 2px solid rgba(255,255,255,0.7);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+    .selection-header.expanded .toggle-icon::after {
+      transform: rotate(-135deg);
+    }
+    .selection-coordinates {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .selection-coordinates.expanded {
+      display: block;
+    }
+    .selection-coordinates::-webkit-scrollbar {
+      width: 6px;
+    }
+    .selection-coordinates::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+    }
+    .selection-coordinates::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+    }
+    .selection-coordinates::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .toolbar-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: rgba(255,255,255,0.05);
+      padding: 6px;
+      border-radius: 12px;
+    }
+    .toolbar-tab {
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      transition: all 0.2s;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex: 1;
+      font-family: 'Inter', sans-serif;
+    }
+    .toolbar-tab.active {
+      background: #ff5555;
+      color: white;
+    }
+    .toolbar-tab:hover:not(.active) {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .shape-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .shape-preset {
+      width: 48px;
+      height: 48px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.05);
+    }
+    .shape-preset:hover {
+      border-color: #ff5555;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255,85,85,0.2);
+    }
+    .shape-preset.active {
+      border-color: #ff5555;
+      background: rgba(255,85,85,0.1);
+      box-shadow: 0 6px 16px rgba(255,85,85,0.2);
+    }
+    .shape-preset svg {
+      width: 28px;
+      height: 28px;
+      fill: rgba(255,255,255,0.7);
+      transition: all 0.2s;
+    }
+    .shape-preset.active svg {
+      fill: #ff5555;
+    }
+    .shape-preset[data-shape="area"] svg {
+      stroke: rgba(255,255,255,0.7);
+      stroke-width: 2;
+      fill: none;
+    }
+    .shape-preset[data-shape="area"].active svg {
+      stroke: #ff5555;
+    }
+
+    .status-bar {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 30, 30, 0.95);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 1000;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+    .status-bar:hover {
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    /* Add new styles for enhanced features */
+    .selection-controls {
+      position: absolute;
+      z-index: 2000;
+      background: rgba(30, 30, 30, 0.95);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      width: 200px;
+      display: none;
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-group h4 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .control-input {
+      flex: 1 1 0;
+      max-width: 100%;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .control-input[type="range"] {
+      min-width: 0;
+      padding: 0;
+      margin-left: 8px;
+      background: none;
+      border: none;
+      height: 2.2em;
+    }
+
+    .control-input:focus {
+      outline: none;
+      border-color: #ff5555;
+      box-shadow: 0 0 0 2px rgba(255,85,85,0.2);
+    }
+
+    .control-button {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .control-button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .control-button.active {
+      background: #ff5555;
+    }
+
+    .minimap {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 200px;
+      height: 150px;
+      background: rgba(30, 30, 30, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+
+    .minimap-viewport {
+      position: absolute;
+      border: 2px solid #ff5555;
+      background: rgba(255,85,85,0.1);
+      pointer-events: none;
+    }
+
+    .selection-label {
+      position: absolute;
+      background: rgba(30, 30, 30, 0.95);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #fff;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .selection-outline {
+      position: absolute;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .selection-outline.dashed {
+      border-style: dashed;
+    }
+
+    .selection-outline.dotted {
+      border-style: dotted;
+    }
+
+    .selection-stats {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(30, 30, 30, 0.95);
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .selection-stats div {
+      margin-bottom: 4px;
+    }
+
+    .selection-stats div:last-child {
+      margin-bottom: 0;
     }
   </style>
 </head>
 <body>
   <div id="toolbar">
-    <label for="colorPicker">Highlight Color:</label>
-    <input type="color" id="colorPicker" value="#ff0000" />
-    <button id="clearBtn">Clear All</button>
+    <div class="toolbar-tabs">
+      <button class="toolbar-tab active" data-tab="grid">Grid</button>
+      <button class="toolbar-tab" data-tab="shapes">Shapes</button>
+    </div>
+    
+    <div class="toolbar-content active" id="grid-tab">
+      <div class="toolbar-group">
+        <label for="gridCols">Grid Columns:</label>
+        <input type="number" id="gridCols" value="40" min="5" max="100" />
+      </div>
+      <div class="toolbar-group">
+        <label for="gridRows">Grid Rows:</label>
+        <input type="number" id="gridRows" value="40" min="5" max="100" />
+      </div>
+      <div class="toolbar-group">
+        <label for="colorPicker">Highlight Color:</label>
+        <input type="color" id="colorPicker" value="#ff0000" />
+      </div>
+      <div class="toolbar-group">
+        <button id="applyGridBtn">Apply Grid</button>
+        <button id="clearBtn">Clear All</button>
+      </div>
+      <div class="toolbar-group">
+        <button id="exportBtn" class="secondary">Export</button>
+        <button id="importBtn" class="secondary">Import</button>
+      </div>
+      <div class="toolbar-group">
+        <button id="undoBtn" class="secondary">Undo</button>
+        <button id="redoBtn" class="secondary">Redo</button>
+      </div>
+    </div>
+
+    <div class="toolbar-content" id="shapes-tab">
+      <div class="toolbar-group">
+        <label>Shape Presets:</label>
+      </div>
+      <div class="shape-presets">
+        <div class="shape-preset" data-shape="rectangle">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20"/></svg>
+        </div>
+        <div class="shape-preset" data-shape="circle">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div class="shape-preset" data-shape="diamond">
+          <svg viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12"/></svg>
+        </div>
+        <div class="shape-preset" data-shape="triangle">
+          <svg viewBox="0 0 24 24"><polygon points="12,2 22,22 2,22"/></svg>
+        </div>
+        <div class="shape-preset" data-shape="hexagon">
+          <svg viewBox="0 0 24 24"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7"/></svg>
+        </div>
+        <div class="shape-preset" data-shape="area">
+          <svg viewBox="0 0 24 24"><path d="M3,3 L21,3 L21,21 L3,21 Z M7,7 L17,7 M7,12 L17,12 M7,17 L17,17"/></svg>
+        </div>
+      </div>
+      <div class="toolbar-group">
+        <label for="shapeSize">Size:</label>
+        <input type="number" id="shapeSize" value="3" min="1" max="10" />
+      </div>
+      <div class="toolbar-group">
+        <button id="applyShapeBtn">Apply Shape</button>
+      </div>
+    </div>
   </div>
   <div id="selection-list">
     <h4>Selections</h4>
@@ -177,9 +684,69 @@
     <div id="tooltip"></div>
   </div>
 
+  <div class="selection-controls">
+    <div class="control-group">
+      <h4>Selection</h4>
+      <div class="control-row">
+        <span class="control-label">Name:</span>
+        <input type="text" class="control-input" id="selectionName" placeholder="Enter name">
+      </div>
+      <div class="control-row">
+        <span class="control-label">Opacity:</span>
+        <input type="range" class="control-input" id="selectionOpacity" min="0" max="100" value="40">
+      </div>
+      <div class="control-row">
+        <span class="control-label">Style:</span>
+        <select class="control-input" id="selectionStyle">
+          <option value="solid">Solid</option>
+          <option value="dashed">Dashed</option>
+          <option value="dotted">Dotted</option>
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <h4>Grid</h4>
+      <div class="control-row">
+        <span class="control-label">Visible:</span>
+        <input type="checkbox" id="gridVisible" checked>
+      </div>
+      <div class="control-row">
+        <span class="control-label">Snap:</span>
+        <input type="checkbox" id="gridSnap" checked>
+      </div>
+      <div class="control-row">
+        <span class="control-label">Color:</span>
+        <input type="color" id="gridColor" value="#ffffff">
+      </div>
+    </div>
+    <div class="control-group">
+      <h4>Tools</h4>
+      <div class="control-row">
+        <button class="control-button" id="mirrorH">Mirror H</button>
+        <button class="control-button" id="mirrorV">Mirror V</button>
+      </div>
+      <div class="control-row">
+        <button class="control-button" id="rotateLeft">Rotate ←</button>
+        <button class="control-button" id="rotateRight">Rotate →</button>
+      </div>
+      <div class="control-row">
+        <button class="control-button" id="bringForward">↑ Layer</button>
+        <button class="control-button" id="sendBackward">↓ Layer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="minimap" id="minimap">
+    <div class="minimap-viewport" id="minimapViewport"></div>
+  </div>
+
+  <div class="selection-stats" id="selectionStats">
+    <div>Cells: <span id="selectedCount">0</span></div>
+  </div>
+
   <script>
     (() => {
-      const cols = 20, rows = 20;
+      let cols = 40, rows = 40;
       const overlay = document.getElementById('gridOverlay');
       const mapContainer = document.getElementById('mapContainer');
       const viewport = document.getElementById('viewport');
@@ -188,48 +755,886 @@
       const colorPicker = document.getElementById('colorPicker');
       const selList = document.getElementById('selList');
       const clearBtn = document.getElementById('clearBtn');
+      const gridCols = document.getElementById('gridCols');
+      const gridRows = document.getElementById('gridRows');
+      const applyGridBtn = document.getElementById('applyGridBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const importBtn = document.getElementById('importBtn');
+      const undoBtn = document.getElementById('undoBtn');
+      const redoBtn = document.getElementById('redoBtn');
+      const toolbarTabs = document.querySelectorAll('.toolbar-tab');
+      const toolbarContents = document.querySelectorAll('.toolbar-content');
+      const shapePresets = document.querySelectorAll('.shape-preset');
+      const shapeSize = document.getElementById('shapeSize');
+      const applyShapeBtn = document.getElementById('applyShapeBtn');
 
       let scale = 1, translate = { x: 0, y: 0 };
       let isPanning = false, panStart = {};
       let isSelecting = false, selectStart = null;
       const selections = [];
+      const history = [];
+      let historyIndex = -1;
+      let currentShape = 'rectangle';
+      let isCustomShape = false;
+      let customShapePoints = [];
+      let areaBoundaryPoints = [];
+      let areaControlPoints = [];
+      let isDrawingArea = false;
+      let isDraggingControlPoint = false;
+      let currentControlPoint = null;
+      let currentPoint = null;
+      let currentSelection = null;
 
-      img.onload = () => {
-        const iw = img.naturalWidth, ih = img.naturalHeight;
-        mapContainer.style.width = iw + 'px'; mapContainer.style.height = ih + 'px';
-        overlay.style.width = iw + 'px'; overlay.style.height = ih + 'px';
-        overlay.style.gridTemplateColumns = `repeat(${cols},1fr)`;
-        overlay.style.gridTemplateRows = `repeat(${rows},1fr)`;
-
-        // center map
-        const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
-        translate.x = (vpW - iw) / 2;
-        translate.y = (vpH - ih) / 2;
-        updateTransform();
-
-        // create grid cells
+      function createGrid() {
+        overlay.innerHTML = '';
+        overlay.style.width = mapContainer.style.width;
+        overlay.style.height = mapContainer.style.height;
+        overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
         for (let r = 1; r <= rows; r++) {
           for (let c = 1; c <= cols; c++) {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
             cell.dataset.row = r;
             cell.dataset.col = c;
-            // tooltip
             cell.addEventListener('mouseenter', e => showTooltip(e, cell));
             cell.addEventListener('mousemove', moveTooltip);
             cell.addEventListener('mouseleave', hideTooltip);
-            // selection
-            cell.addEventListener('mousedown', e => startSelect(e, cell));
+            cell.addEventListener('mousedown', e => {
+              e.preventDefault(); // Prevent right-click
+              if (e.button === 0) { // Only handle left-click
+                startSelect(e, cell);
+              }
+            });
             cell.addEventListener('mouseenter', e => { if (isSelecting) extendSelect(cell); });
+            cell.addEventListener('contextmenu', function(e) {
+              const cell = e.target.closest('.grid-cell.selected');
+              if (cell) {
+                e.preventDefault();
+                // Find which selection this cell belongs to
+                let found = null;
+                for (const sel of selections) {
+                  if (sel.pts.some(pt => {
+                    const [col, row] = pt.match(/\d+/g);
+                    return col == cell.dataset.col && row == cell.dataset.row;
+                  })) {
+                    found = sel;
+                    break;
+                  }
+                }
+                if (found) {
+                  currentSelection = found;
+                  updateSelectionControls();
+                  updateSelectionStats();
+                  renderList();
+                  displaySelections();
+                  // Position the menu at the mouse, but keep it in the viewport
+                  const menu = document.querySelector('.selection-controls');
+                  menu.style.display = 'block';
+                  let x = e.clientX;
+                  let y = e.clientY;
+                  // Wait for menu to be visible to get correct dimensions
+                  setTimeout(() => {
+                    const rect = menu.getBoundingClientRect();
+                    if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                    if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                    menu.style.left = x + 'px';
+                    menu.style.top = y + 'px';
+                  }, 0);
+                }
+              } else {
+                document.querySelector('.selection-controls').style.display = 'none';
+              }
+            });
             overlay.appendChild(cell);
           }
         }
+      }
 
+      // Tab switching
+      toolbarTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          toolbarTabs.forEach(t => t.classList.remove('active'));
+          toolbarContents.forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+        });
+      });
+
+      // Shape preset selection
+      shapePresets.forEach(preset => {
+        preset.addEventListener('click', () => {
+          shapePresets.forEach(p => p.classList.remove('active'));
+          preset.classList.add('active');
+          currentShape = preset.dataset.shape;
+          isCustomShape = currentShape === 'custom';
+          isDrawingArea = currentShape === 'area';
+          if (isCustomShape) {
+            startCustomShape();
+          } else if (isDrawingArea) {
+            startAreaSelection();
+          } else {
+            stopCustomShape();
+            stopAreaSelection();
+          }
+        });
+      });
+
+      function startCustomShape() {
+        overlay.querySelectorAll('.grid-cell').forEach(cell => {
+          cell.addEventListener('click', handleCustomShapeClick);
+        });
+      }
+
+      function stopCustomShape() {
+        overlay.querySelectorAll('.grid-cell').forEach(cell => {
+          cell.removeEventListener('click', handleCustomShapeClick);
+        });
+        customShapePoints = [];
+        clearHighlights();
+      }
+
+      function handleCustomShapeClick(e) {
+        const cell = e.target;
+        const isSelected = cell.classList.contains('selected');
+        
+        if (isSelected) {
+          cell.classList.remove('selected');
+          cell.style.backgroundColor = '';
+          customShapePoints = customShapePoints.filter(p => 
+            p.col !== cell.dataset.col || p.row !== cell.dataset.row
+          );
+        } else {
+          cell.classList.add('selected');
+          cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.4);
+          customShapePoints.push({
+            col: cell.dataset.col,
+            row: cell.dataset.row
+          });
+        }
+      }
+
+      function startAreaSelection() {
+        areaBoundaryPoints = [];
+        areaControlPoints = [];
+        isDrawingArea = true;
+        overlay.querySelectorAll('.grid-cell').forEach(cell => {
+          cell.addEventListener('click', handleAreaBoundaryClick);
+          cell.addEventListener('mousedown', handleControlPointDrag);
+          cell.addEventListener('mousemove', handleControlPointMove);
+          cell.addEventListener('mouseup', handleControlPointRelease);
+          cell.addEventListener('contextmenu', e => e.preventDefault());
+        });
+        updateStatusBar('Click to place boundary points. Drag control points to adjust curves.');
+      }
+
+      function stopAreaSelection() {
+        isDrawingArea = false;
+        overlay.querySelectorAll('.grid-cell').forEach(cell => {
+          cell.removeEventListener('click', handleAreaBoundaryClick);
+          cell.removeEventListener('mousedown', handleControlPointDrag);
+          cell.removeEventListener('mousemove', handleControlPointMove);
+          cell.removeEventListener('mouseup', handleControlPointRelease);
+        });
+        clearHighlights();
+      }
+
+      function handleAreaBoundaryClick(e) {
+        if (!isDrawingArea || isDraggingControlPoint) return;
+        e.preventDefault();
+        const cell = e.target;
+        const point = { col: parseInt(cell.dataset.col), row: parseInt(cell.dataset.row) };
+        
+        // Check if point already exists
+        const exists = areaBoundaryPoints.some(p => p.col === point.col && p.row === point.row);
+        if (exists) {
+          // Remove point if it's the last one added
+          if (areaBoundaryPoints.length > 0 && 
+              areaBoundaryPoints[areaBoundaryPoints.length - 1].col === point.col && 
+              areaBoundaryPoints[areaBoundaryPoints.length - 1].row === point.row) {
+            areaBoundaryPoints.pop();
+            areaControlPoints.pop();
+            cell.classList.remove('boundary');
+            cell.style.backgroundColor = '';
+          }
+        } else {
+          // Add new point
+          areaBoundaryPoints.push(point);
+          // Add control points for bezier curve
+          const controlPoint = {
+            col: point.col + 2,
+            row: point.row
+          };
+          areaControlPoints.push(controlPoint);
+          cell.classList.add('boundary');
+          cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.3);
+        }
+
+        // If we have at least 3 points, try to fill the area
+        if (areaBoundaryPoints.length >= 3) {
+          fillArea();
+        }
+      }
+
+      function handleControlPointDrag(e) {
+        if (!isDrawingArea) return;
+        e.preventDefault();
+        const cell = e.target;
+        const point = { col: parseInt(cell.dataset.col), row: parseInt(cell.dataset.row) };
+        
+        // Check if this is a control point
+        const controlPointIndex = areaControlPoints.findIndex(p => 
+          p.col === point.col && p.row === point.row
+        );
+        
+        if (controlPointIndex !== -1) {
+          isDraggingControlPoint = true;
+          currentControlPoint = controlPointIndex;
+          currentPoint = point;
+          cell.classList.add('control-point');
+          updateStatusBar('Dragging control point. Release to set position.');
+        }
+      }
+
+      function handleControlPointMove(e) {
+        if (!isDraggingControlPoint || !currentControlPoint) return;
+        e.preventDefault();
+        const cell = e.target;
+        const point = { col: parseInt(cell.dataset.col), row: parseInt(cell.dataset.row) };
+        
+        // Update control point position
+        areaControlPoints[currentControlPoint] = point;
+        
+        // Redraw the curve
+        clearHighlights();
+        drawBezierCurve();
+      }
+
+      function handleControlPointRelease(e) {
+        if (isDraggingControlPoint) {
+          e.preventDefault();
+          isDraggingControlPoint = false;
+          currentControlPoint = null;
+          currentPoint = null;
+          clearHighlights();
+          drawBezierCurve();
+          updateStatusBar('Click to place boundary points. Drag control points to adjust curves.');
+        }
+      }
+
+      function drawBezierCurve() {
+        // Draw boundary points
+        areaBoundaryPoints.forEach((p, i) => {
+          const cell = overlay.querySelector(`[data-col="${p.col}"][data-row="${p.row}"]`);
+          if (cell) {
+            cell.classList.add('boundary');
+            cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.3);
+          }
+        });
+
+        // Draw control points and lines
+        areaControlPoints.forEach((p, i) => {
+          const cell = overlay.querySelector(`[data-col="${p.col}"][data-row="${p.row}"]`);
+          if (cell) {
+            cell.classList.add('control-point');
+            cell.style.backgroundColor = hexToRgba('#55aaff', 0.3);
+          }
+          
+          // Draw control line to boundary point
+          if (areaBoundaryPoints[i]) {
+            drawLine(p, areaBoundaryPoints[i], true);
+          }
+        });
+
+        // Draw bezier curves between points
+        for (let i = 0; i < areaBoundaryPoints.length; i++) {
+          const p0 = areaBoundaryPoints[i];
+          const p1 = areaControlPoints[i];
+          const p2 = areaBoundaryPoints[(i + 1) % areaBoundaryPoints.length];
+          const p3 = areaControlPoints[(i + 1) % areaControlPoints.length];
+          
+          drawBezierSegment(p0, p1, p2, p3);
+        }
+      }
+
+      function drawLine(start, end, isPreview = false) {
+        const dx = Math.abs(end.col - start.col);
+        const dy = Math.abs(end.row - start.row);
+        const sx = start.col < end.col ? 1 : -1;
+        const sy = start.row < end.row ? 1 : -1;
+        let err = dx - dy;
+
+        let x = start.col;
+        let y = start.row;
+
+        while (true) {
+          const cell = overlay.querySelector(`[data-col="${x}"][data-row="${y}"]`);
+          if (cell) {
+            if (isPreview) {
+              cell.classList.add('control-line');
+              cell.style.backgroundColor = hexToRgba('#55aaff', 0.1);
+            }
+          }
+
+          if (x === end.col && y === end.row) break;
+          const e2 = 2 * err;
+          if (e2 > -dy) {
+            err -= dy;
+            x += sx;
+          }
+          if (e2 < dx) {
+            err += dx;
+            y += sy;
+          }
+        }
+      }
+
+      function drawBezierSegment(p0, p1, p2, p3) {
+        const steps = 20;
+        for (let t = 0; t <= 1; t += 1/steps) {
+          const x = Math.pow(1-t, 3) * p0.col + 
+                   3 * Math.pow(1-t, 2) * t * p1.col + 
+                   3 * (1-t) * Math.pow(t, 2) * p2.col + 
+                   Math.pow(t, 3) * p3.col;
+          const y = Math.pow(1-t, 3) * p0.row + 
+                   3 * Math.pow(1-t, 2) * t * p1.row + 
+                   3 * (1-t) * Math.pow(t, 2) * p2.row + 
+                   Math.pow(t, 3) * p3.row;
+          
+          const cell = overlay.querySelector(`[data-col="${Math.round(x)}"][data-row="${Math.round(y)}"]`);
+          if (cell) {
+            cell.classList.add('preview');
+            cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.1);
+          }
+        }
+      }
+
+      function updateStatusBar(message) {
+        const statusBar = document.createElement('div');
+        statusBar.className = 'status-bar';
+        statusBar.textContent = message;
+        
+        const existingStatusBar = document.querySelector('.status-bar');
+        if (existingStatusBar) {
+          existingStatusBar.remove();
+        }
+        
+        document.body.appendChild(statusBar);
+      }
+
+      function fillArea() {
+        if (areaBoundaryPoints.length < 3) return;
+
+        // Create a grid to track filled cells
+        const grid = Array(rows + 1).fill().map(() => Array(cols + 1).fill(0));
+        
+        // Mark boundary points and curves
+        for (let i = 0; i < areaBoundaryPoints.length; i++) {
+          const p0 = areaBoundaryPoints[i];
+          const p1 = areaControlPoints[i];
+          const p2 = areaBoundaryPoints[(i + 1) % areaBoundaryPoints.length];
+          const p3 = areaControlPoints[(i + 1) % areaControlPoints.length];
+          
+          // Mark the boundary points
+          grid[p0.row][p0.col] = 1;
+          
+          // Mark the bezier curve
+          const steps = 20;
+          for (let t = 0; t <= 1; t += 1/steps) {
+            const x = Math.round(Math.pow(1-t, 3) * p0.col + 
+                    3 * Math.pow(1-t, 2) * t * p1.col + 
+                    3 * (1-t) * Math.pow(t, 2) * p2.col + 
+                    Math.pow(t, 3) * p3.col);
+            const y = Math.round(Math.pow(1-t, 3) * p0.row + 
+                    3 * Math.pow(1-t, 2) * t * p1.row + 
+                    3 * (1-t) * Math.pow(t, 2) * p2.row + 
+                    Math.pow(t, 3) * p3.row);
+            
+            if (x >= 1 && x <= cols && y >= 1 && y <= rows) {
+              grid[y][x] = 1;
+            }
+          }
+        }
+
+        // Fill the area using flood fill
+        const startPoint = findInteriorPoint(grid);
+        if (startPoint) {
+          floodFill(grid, startPoint.row, startPoint.col);
+        }
+
+        // Apply the fill to the grid
+        for (let r = 1; r <= rows; r++) {
+          for (let c = 1; c <= cols; c++) {
+            if (grid[r][c] === 2) {
+              const cell = overlay.querySelector(`[data-col="${c}"][data-row="${r}"]`);
+              if (cell) {
+                cell.classList.add('selected');
+                cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.4);
+              }
+            }
+          }
+        }
+      }
+
+      function findInteriorPoint(grid) {
+        // Find a point that's inside the boundary
+        for (let r = 1; r <= rows; r++) {
+          for (let c = 1; c <= cols; c++) {
+            if (grid[r][c] === 0) {
+              // Check if this point is inside the boundary
+              let intersections = 0;
+              for (let i = c + 1; i <= cols; i++) {
+                if (grid[r][i] === 1) intersections++;
+              }
+              if (intersections % 2 === 1) {
+                return { row: r, col: c };
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      function floodFill(grid, row, col) {
+        if (row < 1 || row > rows || col < 1 || col > cols || grid[row][col] !== 0) {
+          return;
+        }
+
+        grid[row][col] = 2; // Mark as filled
+
+        // Recursively fill adjacent cells
+        floodFill(grid, row + 1, col);
+        floodFill(grid, row - 1, col);
+        floodFill(grid, row, col + 1);
+        floodFill(grid, row, col - 1);
+      }
+
+      function createShape(startCell, endCell) {
+        const startCol = parseInt(startCell.dataset.col);
+        const startRow = parseInt(startCell.dataset.row);
+        const endCol = parseInt(endCell.dataset.col);
+        const endRow = parseInt(endCell.dataset.row);
+        const cells = [];
+
+        // Calculate dimensions based on drag distance
+        const width = Math.abs(endCol - startCol) + 1;
+        const height = Math.abs(endRow - startRow) + 1;
+        const centerCol = Math.floor((startCol + endCol) / 2);
+        const centerRow = Math.floor((startRow + endRow) / 2);
+        const radius = Math.max(width, height) / 2;
+
+        switch (currentShape) {
+          case 'rectangle':
+            const rmin = Math.min(startRow, endRow);
+            const rmax = Math.max(startRow, endRow);
+            const cmin = Math.min(startCol, endCol);
+            const cmax = Math.max(startCol, endCol);
+            for (let r = rmin; r <= rmax; r++) {
+              for (let c = cmin; c <= cmax; c++) {
+                cells.push({ col: c, row: r });
+              }
+            }
+            break;
+          case 'circle':
+            for (let r = centerRow - radius; r <= centerRow + radius; r++) {
+              for (let c = centerCol - radius; c <= centerCol + radius; c++) {
+                const dx = c - centerCol;
+                const dy = r - centerRow;
+                if (dx * dx + dy * dy <= radius * radius) {
+                  cells.push({ col: c, row: r });
+                }
+              }
+            }
+            break;
+          case 'diamond':
+            for (let r = centerRow - radius; r <= centerRow + radius; r++) {
+              for (let c = centerCol - radius; c <= centerCol + radius; c++) {
+                if (Math.abs(c - centerCol) + Math.abs(r - centerRow) <= radius) {
+                  cells.push({ col: c, row: r });
+                }
+              }
+            }
+            break;
+          case 'triangle':
+            const baseWidth = width;
+            const height2 = height;
+            const topRow = Math.min(startRow, endRow);
+            const bottomRow = Math.max(startRow, endRow);
+            const leftCol = Math.min(startCol, endCol);
+            const rightCol = Math.max(startCol, endCol);
+            
+            for (let r = topRow; r <= bottomRow; r++) {
+              const rowProgress = (r - topRow) / height2;
+              const rowWidth = Math.floor(baseWidth * rowProgress);
+              const center = Math.floor((leftCol + rightCol) / 2);
+              for (let c = center - rowWidth; c <= center + rowWidth; c++) {
+                cells.push({ col: c, row: r });
+              }
+            }
+            break;
+          case 'hexagon':
+            const hexRadius = radius;
+            for (let r = centerRow - hexRadius; r <= centerRow + hexRadius; r++) {
+              for (let c = centerCol - hexRadius; c <= centerCol + hexRadius; c++) {
+                const dx = Math.abs(c - centerCol);
+                const dy = Math.abs(r - centerRow);
+                if (dx + dy <= hexRadius + 1 && dx <= hexRadius && dy <= hexRadius) {
+                  cells.push({ col: c, row: r });
+                }
+              }
+            }
+            break;
+        }
+
+        return cells.filter(cell => 
+          cell.col >= 1 && cell.col <= cols && 
+          cell.row >= 1 && cell.row <= rows
+        );
+      }
+
+      function startSelect(e, cell) {
+        if (e.button !== 0) return;
+        isSelecting = true;
+        selectStart = cell;
+        clearHighlights();
+
+        if (isCustomShape) {
+          handleCustomShapeClick({ target: cell });
+        } else if (isDrawingArea) {
+          handleAreaBoundaryClick({ target: cell });
+        } else {
+          // For all other shapes, start with just the initial cell
+          highlight(cell);
+        }
+      }
+
+      function extendSelect(cell) {
+        if (!isSelecting || isCustomShape || isDrawingArea) return;
+        clearHighlights();
+        
+        // Create shape based on drag distance
+        const shapeCells = createShape(selectStart, cell);
+        shapeCells.forEach(({ col, row }) => {
+          const targetCell = overlay.querySelector(`[data-col="${col}"][data-row="${row}"]`);
+          if (targetCell) {
+            highlight(targetCell);
+          }
+        });
+      }
+
+      function finishSelect() {
+        if (!isSelecting) return;
+        isSelecting = false;
+        
+        if (isCustomShape) {
+          if (customShapePoints.length > 0) {
+            const pts = customShapePoints.map(p => `(${p.col}, ${p.row})`);
+            selections.push({ color: colorPicker.value, pts });
+            renderList();
+            saveState();
+          }
+          stopCustomShape();
+        } else if (isDrawingArea) {
+          if (areaBoundaryPoints.length >= 3) {
+            const highlighted = Array.from(overlay.querySelectorAll('.grid-cell.selected'));
+            const pts = highlighted.map(c => `(${c.dataset.col}, ${c.dataset.row})`);
+            selections.push({ color: colorPicker.value, pts });
+            renderList();
+            saveState();
+          }
+          stopAreaSelection();
+        } else {
+          const highlighted = Array.from(overlay.querySelectorAll('.grid-cell.selected'));
+          if (highlighted.length > 0) {
+            const color = colorPicker.value;
+            const pts = highlighted.map(c => `(${c.dataset.col}, ${c.dataset.row})`);
+            selections.push({ color, pts });
+            renderList();
+            saveState();
+          }
+        }
+        clearHighlights();
+        displaySelections();
+        currentSelection = selections[selections.length - 1];
+        updateSelectionControls();
+        updateSelectionStats();
+      }
+
+      function displaySelections() {
+        overlay.querySelectorAll('.grid-cell').forEach(cell => {
+          cell.classList.remove('selected');
+          cell.style.backgroundColor = '';
+          cell.style.outline = '';
+        });
+        selections.forEach(sel => {
+          sel.pts.forEach(pt => {
+            const [col, row] = pt.match(/\d+/g);
+            const cell = overlay.querySelector(`[data-col="${col}"][data-row="${row}"]`);
+            if (cell) {
+              cell.classList.add('selected');
+              const opacity = sel.opacity ?? 0.4;
+              cell.style.backgroundColor = hexToRgba(sel.color, opacity);
+              if (sel.style === 'dashed') {
+                cell.style.outline = '2px dashed #fff';
+              } else if (sel.style === 'dotted') {
+                cell.style.outline = '2px dotted #fff';
+              } else {
+                cell.style.outline = '';
+              }
+            }
+          });
+        });
+      }
+
+      function highlight(cell) {
+        cell.classList.add('selected');
+        cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.4);
+      }
+
+      function clearHighlights() {
+        overlay.querySelectorAll('.grid-cell').forEach(c => {
+          c.classList.remove('boundary', 'control-point', 'control-line', 'preview');
+          if (!c.classList.contains('selected')) {
+            c.style.backgroundColor = '';
+          }
+        });
+      }
+
+      function renderList() {
+        selList.innerHTML = '';
+        selections.forEach((sel, i) => {
+          const li = document.createElement('li');
+          if (sel === currentSelection) li.style.background = 'rgba(255,85,85,0.15)';
+          const header = document.createElement('div');
+          header.className = 'selection-header';
+          const box = document.createElement('span');
+          box.className = 'color-box';
+          box.style.background = sel.color;
+          const title = document.createElement('span');
+          title.className = 'selection-title';
+          title.textContent = sel.name || `Group ${i + 1} (${sel.pts.length} cells)`;
+          const toggle = document.createElement('span');
+          toggle.className = 'toggle-icon';
+          header.append(box, title, toggle);
+          const coords = document.createElement('div');
+          coords.className = 'selection-coordinates';
+          coords.textContent = sel.pts.join(', ');
+          li.append(header, coords);
+          header.addEventListener('click', e => {
+            if (e.target === toggle) {
+              header.classList.toggle('expanded');
+              coords.classList.toggle('expanded');
+              return;
+            }
+            currentSelection = sel;
+            updateSelectionControls();
+            renderList();
+            updateSelectionStats();
+            displaySelections();
+          });
+          selList.append(li);
+        });
+      }
+
+      function updateSelectionControls() {
+        const nameInput = document.getElementById('selectionName');
+        const opacityInput = document.getElementById('selectionOpacity');
+        const styleInput = document.getElementById('selectionStyle');
+        if (!currentSelection) {
+          nameInput.value = '';
+          opacityInput.value = 40;
+          styleInput.value = 'solid';
+          return;
+        }
+        nameInput.value = currentSelection.name || '';
+        opacityInput.value = Math.round((currentSelection.opacity ?? 0.4) * 100);
+        styleInput.value = currentSelection.style || 'solid';
+      }
+
+      function updateSelectionStats() {
+        if (!currentSelection) {
+          document.getElementById('selectedCount').textContent = 0;
+          return;
+        }
+        const count = currentSelection.pts.length;
+        document.getElementById('selectedCount').textContent = count;
+      }
+
+      function hexToRgba(hex, alpha) {
+        const bigint = parseInt(hex.replace('#',''), 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r},${g},${b},${alpha})`;
+      }
+
+      function saveState() {
+        if (historyIndex < history.length - 1) {
+          history.splice(historyIndex + 1);
+        }
+        
+        history.push(JSON.stringify(selections));
+        historyIndex = history.length - 1;
+        
+        updateUndoRedoButtons();
+        displaySelections();
+      }
+
+      function updateUndoRedoButtons() {
+        undoBtn.disabled = historyIndex <= 0;
+        redoBtn.disabled = historyIndex >= history.length - 1;
+      }
+
+      function loadState(state) {
+        try {
+          const newSelections = JSON.parse(state);
+          selections.length = 0;
+          selections.push(...newSelections);
+          renderList();
+          clearHighlights();
+          displaySelections();
+        } catch (error) {
+          console.error('Error loading state:', error);
+        }
+      }
+
+      function undo() {
+        if (historyIndex > 0) {
+          historyIndex--;
+          loadState(history[historyIndex]);
+          updateUndoRedoButtons();
+        }
+      }
+
+      function redo() {
+        if (historyIndex < history.length - 1) {
+          historyIndex++;
+          loadState(history[historyIndex]);
+          updateUndoRedoButtons();
+        }
+      }
+
+      function exportSelections() {
+        const data = JSON.stringify(selections);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'map-selections.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function importSelections() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = event => {
+              try {
+                const data = JSON.parse(event.target.result);
+                selections.length = 0;
+                selections.push(...data);
+                saveState();
+                renderList();
+                displaySelections();
+              } catch (error) {
+                alert('Invalid file format');
+              }
+            };
+            reader.readAsText(file);
+          }
+        };
+        input.click();
+      }
+
+      function initializeButtons() {
+        applyGridBtn.onclick = () => {
+          cols = parseInt(gridCols.value) || 40;
+          rows = parseInt(gridRows.value) || 40;
+          createGrid();
+          clearHighlights();
+          selections.length = 0;
+          renderList();
+          saveState();
+        };
+
+        clearBtn.onclick = () => {
+          clearHighlights();
+          selections.length = 0;
+          renderList();
+          saveState();
+        };
+
+        exportBtn.onclick = () => {
+          const data = JSON.stringify(selections);
+          const blob = new Blob([data], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'map-selections.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        };
+
+        importBtn.onclick = () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = '.json';
+          input.onchange = e => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = event => {
+                try {
+                  const data = JSON.parse(event.target.result);
+                  selections.length = 0;
+                  selections.push(...data);
+                  saveState();
+                  renderList();
+                  displaySelections();
+                } catch (error) {
+                  alert('Invalid file format');
+                }
+              };
+              reader.readAsText(file);
+            }
+          };
+          input.click();
+        };
+
+        undoBtn.onclick = undo;
+        redoBtn.onclick = redo;
+      }
+
+      history.push(JSON.stringify([]));
+      historyIndex = 0;
+      updateUndoRedoButtons();
+
+      img.onload = () => {
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        mapContainer.style.width = iw + 'px';
+        mapContainer.style.height = ih + 'px';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        createGrid();
+        displaySelections();
+        initializeButtons();
+        const vpW = viewport.clientWidth, vpH = viewport.clientHeight;
+        translate.x = (vpW - iw) / 2;
+        translate.y = (vpH - ih) / 2;
+        updateTransform();
         viewport.addEventListener('wheel', onZoom, { passive: false });
         viewport.addEventListener('mousedown', onPanStart);
         viewport.addEventListener('mousemove', onPanMove);
         viewport.addEventListener('mouseup', onPanEnd);
         viewport.addEventListener('mouseleave', onPanEnd);
+        initializeEnhancedFeatures();
       };
 
       function updateTransform() {
@@ -262,7 +1667,9 @@
       function onPanEnd() {
         isPanning = false;
         viewport.style.cursor = 'grab';
-        if (isSelecting) finishSelect();
+        if (isSelecting) {
+          finishSelect();
+        }
       }
 
       function onZoom(e) {
@@ -294,73 +1701,180 @@
         setTimeout(() => { if (tooltip.style.opacity === '0') tooltip.style.display = 'none'; }, 200);
       }
 
-      function startSelect(e, cell) {
-        if (e.button !== 0) return;
-        isSelecting = true;
-        selectStart = cell;
-        clearHighlights();
-        highlight(cell);
-      }
-      function extendSelect(cell) {
-        clearHighlights();
-        const r1 = +selectStart.dataset.row, c1 = +selectStart.dataset.col;
-        const r2 = +cell.dataset.row, c2 = +cell.dataset.col;
-        const rmin = Math.min(r1, r2), rmax = Math.max(r1, r2);
-        const cmin = Math.min(c1, c2), cmax = Math.max(c1, c2);
-        overlay.querySelectorAll('.grid-cell').forEach(c => {
-          const rr = +c.dataset.row, cc = +c.dataset.col;
-          if (rr >= rmin && rr <= rmax && cc >= cmin && cc <= cmax) highlight(c);
-        });
-      }
-      function finishSelect() {
-        isSelecting = false;
-        const highlighted = Array.from(overlay.querySelectorAll('.grid-cell.selected'));
-        const color = colorPicker.value;
-        const pts = highlighted.map(c => `(${c.dataset.col}, ${c.dataset.row})`);
-        selections.push({ color, pts });
-        highlighted.forEach(c => c.classList.remove('selected'));
-        renderList();
-      }
-
-      function highlight(cell) {
-        cell.classList.add('selected');
-        cell.style.backgroundColor = hexToRgba(colorPicker.value, 0.4);
-      }
-      function clearHighlights() {
-        overlay.querySelectorAll('.grid-cell.selected').forEach(c => {
-          c.classList.remove('selected');
-          c.style.backgroundColor = '';
-        });
-      }
-
-      function renderList() {
-        selList.innerHTML = '';
-        selections.forEach((sel, i) => {
-          const li = document.createElement('li');
-          const box = document.createElement('span');
-          box.className = 'color-box';
-          box.style.background = sel.color;
-          const text = document.createTextNode(`Group ${i + 1}: ${sel.pts.join(', ')}`);
-          li.append(box, text);
-          selList.append(li);
-        });
-      }
-
-      clearBtn.onclick = () => {
-        selections.length = 0;
-        selList.innerHTML = '';
-        overlay.querySelectorAll('.grid-cell').forEach(c => {
-          c.style.backgroundColor = '';
-        });
+      applyShapeBtn.onclick = () => {
+        if (isCustomShape && customShapePoints.length > 0) {
+          const pts = customShapePoints.map(p => `(${p.col}, ${p.row})`);
+          selections.push({ color: colorPicker.value, pts });
+          renderList();
+          saveState();
+          stopCustomShape();
+        }
       };
 
-      function hexToRgba(hex, alpha) {
-        const bigint = parseInt(hex.replace('#',''), 16);
-        const r = (bigint >> 16) & 255;
-        const g = (bigint >> 8) & 255;
-        const b = bigint & 255;
-        return `rgba(${r},${g},${b},${alpha})`;
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      viewport.addEventListener('contextmenu', e => e.preventDefault());
+
+      function initializeEnhancedFeatures() {
+        const selectionName = document.getElementById('selectionName');
+        const selectionOpacity = document.getElementById('selectionOpacity');
+        const selectionStyle = document.getElementById('selectionStyle');
+        const gridVisible = document.getElementById('gridVisible');
+        const gridSnap = document.getElementById('gridSnap');
+        const gridColor = document.getElementById('gridColor');
+
+        initializeMinimap();
+
+        selectionName.addEventListener('input', () => {
+          if (currentSelection) {
+            currentSelection.name = selectionName.value;
+            renderList();
+          }
+        });
+        selectionOpacity.addEventListener('input', () => {
+          if (currentSelection) {
+            currentSelection.opacity = selectionOpacity.value / 100;
+            displaySelections();
+          }
+        });
+        selectionStyle.addEventListener('change', () => {
+          if (currentSelection) {
+            currentSelection.style = selectionStyle.value;
+            displaySelections();
+          }
+        });
+        gridVisible.addEventListener('change', toggleGridVisibility);
+        gridSnap.addEventListener('change', toggleGridSnap);
+        gridColor.addEventListener('change', updateGridColor);
+
+        document.getElementById('mirrorH').addEventListener('click', () => mirrorSelection('horizontal'));
+        document.getElementById('mirrorV').addEventListener('click', () => mirrorSelection('vertical'));
+        document.getElementById('rotateLeft').addEventListener('click', () => rotateSelection(-90));
+        document.getElementById('rotateRight').addEventListener('click', () => rotateSelection(90));
+        document.getElementById('bringForward').addEventListener('click', bringSelectionForward);
+        document.getElementById('sendBackward').addEventListener('click', sendSelectionBackward);
       }
+
+      function initializeMinimap() {
+        const minimap = document.getElementById('minimap');
+        const viewport = document.getElementById('minimapViewport');
+        
+        function updateMinimap() {
+          const scale = Math.min(
+            minimap.clientWidth / img.naturalWidth,
+            minimap.clientHeight / img.naturalHeight
+          );
+          
+          viewport.style.width = `${viewport.clientWidth * scale}px`;
+          viewport.style.height = `${viewport.clientHeight * scale}px`;
+          viewport.style.left = `${-translate.x * scale}px`;
+          viewport.style.top = `${-translate.y * scale}px`;
+        }
+
+        viewport.addEventListener('wheel', updateMinimap);
+        viewport.addEventListener('mousemove', updateMinimap);
+      }
+
+      function toggleGridVisibility() {
+        const visible = document.getElementById('gridVisible').checked;
+        overlay.style.display = visible ? 'grid' : 'none';
+      }
+
+      function toggleGridSnap() {
+        const snap = document.getElementById('gridSnap').checked;
+        // Implement grid snapping logic
+      }
+
+      function updateGridColor() {
+        const color = document.getElementById('gridColor').value;
+        overlay.style.borderColor = color;
+      }
+
+      function mirrorSelection(direction) {
+        if (!currentSelection) return;
+        
+        const cells = currentSelection.pts;
+        const center = findSelectionCenter(cells);
+        
+        cells.forEach(cell => {
+          if (direction === 'horizontal') {
+            cell.col = 2 * center.col - cell.col;
+          } else {
+            cell.row = 2 * center.row - cell.row;
+          }
+        });
+        
+        updateSelectionDisplay();
+      }
+
+      function rotateSelection(angle) {
+        if (!currentSelection) return;
+        
+        const cells = currentSelection.pts;
+        const center = findSelectionCenter(cells);
+        const radians = angle * Math.PI / 180;
+        
+        cells.forEach(cell => {
+          const dx = cell.col - center.col;
+          const dy = cell.row - center.row;
+          cell.col = Math.round(center.col + dx * Math.cos(radians) - dy * Math.sin(radians));
+          cell.row = Math.round(center.row + dx * Math.sin(radians) + dy * Math.cos(radians));
+        });
+        
+        updateSelectionDisplay();
+      }
+
+      function findSelectionCenter(cells) {
+        const sum = cells.reduce((acc, cell) => ({
+          col: acc.col + cell.col,
+          row: acc.row + cell.row
+        }), { col: 0, row: 0 });
+        
+        return {
+          col: Math.round(sum.col / cells.length),
+          row: Math.round(sum.row / cells.length)
+        };
+      }
+
+      function bringSelectionForward() {
+        if (!currentSelection) return;
+        const index = selections.indexOf(currentSelection);
+        if (index < selections.length - 1) {
+          selections.splice(index, 1);
+          selections.splice(index + 1, 0, currentSelection);
+          updateSelectionDisplay();
+        }
+      }
+
+      function sendSelectionBackward() {
+        if (!currentSelection) return;
+        const index = selections.indexOf(currentSelection);
+        if (index > 0) {
+          selections.splice(index, 1);
+          selections.splice(index - 1, 0, currentSelection);
+          updateSelectionDisplay();
+        }
+      }
+
+      function updateSelectionDisplay() {
+        // Implement update selection display logic
+      }
+
+      const selectionControls = document.querySelector('.selection-controls');
+
+      // Hide the menu on outside click
+      window.addEventListener('mousedown', function(e) {
+        if (!selectionControls.contains(e.target)) {
+          selectionControls.style.display = 'none';
+        }
+      });
+
+      // Hide the menu on scroll or resize
+      window.addEventListener('scroll', function() {
+        selectionControls.style.display = 'none';
+      });
+      window.addEventListener('resize', function() {
+        selectionControls.style.display = 'none';
+      });
     })();
   </script>
 </body>
