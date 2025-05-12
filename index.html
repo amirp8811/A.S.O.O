@@ -1,21 +1,111 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Game Map Grid</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Map Grid Overlay</title>
   <style>
-    canvas {
+    body, html { margin: 0; padding: 0; height: 100%; }
+    .map-container {
+      position: relative;
+      display: inline-block;
+    }
+    .map-image {
       display: block;
-      margin: 0 auto;
-      background-image: url('map.png');
-      background-size: contain;
-      border: 2px solid #333;
+      max-width: 100%;
+      height: auto;
+    }
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      pointer-events: none; /* allow hover events on children */
+    }
+    .grid-cell {
+      border: 1px solid rgba(255,255,255,0.2);
+      pointer-events: auto;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+    .grid-cell:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+      cursor: crosshair;
+    }
+    .tooltip {
+      position: absolute;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translate(-50%, -120%);
+      display: none;
     }
   </style>
 </head>
 <body>
-  <canvas id="mapCanvas" width="800" height="600"></canvas>
-  <script src="grid.js"></script>
+  <div class="map-container" id="mapContainer">
+    <img src="your-game-map.png" alt="Game Map" class="map-image" id="mapImage" />
+    <div class="grid-overlay" id="gridOverlay"></div>
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <script>
+    (function() {
+      const cols = 10; // set number of columns
+      const rows = 10; // set number of rows
+      const overlay = document.getElementById('gridOverlay');
+      const tooltip = document.getElementById('tooltip');
+
+      // Wait until image loads to set overlay grid
+      const img = document.getElementById('mapImage');
+      img.addEventListener('load', initGrid);
+
+      function initGrid() {
+        // set grid dimensions
+        overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+        // create cells
+        for (let r = 1; r <= rows; r++) {
+          for (let c = 1; c <= cols; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            // enable pointer events
+            cell.addEventListener('mousemove', onHover);
+            cell.addEventListener('mouseenter', onEnter);
+            cell.addEventListener('mouseleave', onLeave);
+            overlay.appendChild(cell);
+          }
+        }
+      }
+
+      function onEnter(e) {
+        const cell = e.target;
+        tooltip.style.display = 'block';
+        tooltip.textContent = `(${cell.dataset.col}, ${cell.dataset.row})`;
+      }
+
+      function onHover(e) {
+        const cell = e.target;
+        const rect = cell.getBoundingClientRect();
+        const mapRect = document.getElementById('mapContainer').getBoundingClientRect();
+        // position tooltip relative to cell
+        tooltip.style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
+        tooltip.style.top = `${rect.top - mapRect.top}px`;
+      }
+
+      function onLeave() {
+        tooltip.style.display = 'none';
+      }
+    })();
+  </script>
 </body>
 </html>
